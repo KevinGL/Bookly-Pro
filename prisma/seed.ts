@@ -11,7 +11,8 @@ export async function main()
     let user = await prisma.user.create({
         data: 
             {
-                name: "Vinke013",
+                firstname: "Kévin",
+                lastname: "Gay",
                 email: "kevinferrogl@gmail.com",
                 password: await bcrypt.hash("admin", 10),
                 role: "admin"
@@ -25,7 +26,8 @@ export async function main()
     {
         let user = await prisma.user.create({
             data: {
-                name: faker.internet.username(),
+                firstname: faker.person.firstName(),
+                lastname: faker.person.lastName(),
                 email: faker.internet.email(),
                 password: await bcrypt.hash("1234", 10),
                 role: "admin"
@@ -39,7 +41,8 @@ export async function main()
     {
         await prisma.user.create({
             data: {
-                name: faker.internet.username(),
+                firstname: faker.person.firstName(),
+                lastname: faker.person.lastName(),
                 email: faker.internet.email(),
                 password: await bcrypt.hash("1234", 10),
                 role: "client"
