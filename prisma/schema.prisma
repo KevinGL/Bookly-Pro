@@ -24,10 +24,18 @@ model User {
   services    Service[]
 }
 
+model Category {
+  id          Int @id @default(autoincrement())
+  name        String
+  services    Service[]
+}
+
 model Service {
   id          Int @id @default(autoincrement())
   ownerId     Int
   user        User      @relation(fields: [ownerId], references: [id])
+  categoryId  Int
+  category    Category  @relation(fields: [categoryId], references: [id])
   title       String
   duration    Int // minutes
   price       Float?

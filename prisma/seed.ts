@@ -52,6 +52,31 @@ export async function main()
 
     ////////////////////
 
+    const categories = new Map();
+
+    let cat = await prisma.category.create({
+        data: {
+            name: "Photographe professionnel"
+        }
+    });
+    categories.set("photographer", cat);
+
+    cat = await prisma.category.create({
+        data: {
+            name: "Salon de coiffure / beauté"
+        }
+    });
+    categories.set("beauty", cat);
+
+    cat = await prisma.category.create({
+        data: {
+            name: "Coach bien-être / développement personnel"
+        }
+    });
+    categories.set("comfort", cat);
+
+    ////////////////////
+
     let owner = admins[Math.floor(admins.length * Math.random())];
     let services = 
     [
@@ -60,7 +85,8 @@ export async function main()
             duration: 60,
             price: 80.0,
             description: "Séance en studio avec 10 photos retouchées",
-            ownerId: owner.id
+            ownerId: owner.id,
+            categoryId: categories.get("photographer").id
         },
 
         {
@@ -68,7 +94,8 @@ export async function main()
             duration: 90,
             price: 120.0,
             description: "Photos en extérieur avec lumière naturelle, 15 clichés HD",
-            ownerId: owner.id
+            ownerId: owner.id,
+            categoryId: categories.get("photographer").id
         },
 
         {
@@ -76,7 +103,8 @@ export async function main()
             duration: 120,
             price: 150.0,
             description: "Shooting convivial pour familles ou couples, 20 photos retouchées",
-            ownerId: owner.id
+            ownerId: owner.id,
+            categoryId: categories.get("photographer").id
         },
 
         {
@@ -84,7 +112,8 @@ export async function main()
             duration: 150,
             price: 220.0,
             description: "Portraits pro pour CV, LinkedIn ou site web, fond neutre ou ambiance pro",
-            ownerId: owner.id
+            ownerId: owner.id,
+            categoryId: categories.get("photographer").id
         }
     ];
 
@@ -105,7 +134,8 @@ export async function main()
             duration: 45,
             price: 45.0,
             description: "Shampooing, coupe et brushing inclus",
-            ownerId: owner.id
+            ownerId: owner.id,
+            categoryId: categories.get("beauty").id
         },
 
         {
@@ -113,7 +143,8 @@ export async function main()
             duration: 30,
             price: 25.0,
             description: "Coupe + finition barbe au choix",
-            ownerId: owner.id
+            ownerId: owner.id,
+            categoryId: categories.get("beauty").id
         },
 
         {
@@ -121,7 +152,8 @@ export async function main()
             duration: 150,
             price: 70.0,
             description: "Application d'une couleur unique avec soins",
-            ownerId: owner.id
+            ownerId: owner.id,
+            categoryId: categories.get("beauty").id
         },
 
         {
@@ -129,7 +161,8 @@ export async function main()
             duration: 120,
             price: 95.0,
             description: "Effet lumineux et naturel, brushing inclus",
-            ownerId: owner.id
+            ownerId: owner.id,
+            categoryId: categories.get("beauty").id
         },
 
         {
@@ -137,7 +170,8 @@ export async function main()
             duration: 45,
             price: 35.0,
             description: "Lime, soin, pose de vernis semi-permanent",
-            ownerId: owner.id
+            ownerId: owner.id,
+            categoryId: categories.get("beauty").id
         }
     ];
 
@@ -158,7 +192,8 @@ export async function main()
             duration: 60,
             price: 60.0,
             description: "Travail ciblé sur vos objectifs personnels ou professionnels",
-            ownerId: owner.id
+            ownerId: owner.id,
+            categoryId: categories.get("comfort").id
         },
 
         {
@@ -166,7 +201,8 @@ export async function main()
             duration: 30,
             price: 0.0,
             description: "Première rencontre pour identifier vos besoins",
-            ownerId: owner.id
+            ownerId: owner.id,
+            categoryId: categories.get("comfort").id
         },
 
         {
@@ -174,7 +210,8 @@ export async function main()
             duration: 150,
             price: 80.0,
             description: "Session complète sur la gestion du stress et affirmation de soi",
-            ownerId: owner.id
+            ownerId: owner.id,
+            categoryId: categories.get("comfort").id
         },
 
         {
@@ -182,7 +219,8 @@ export async function main()
             duration: 60,
             price: 70.0,
             description: "Accompagnement pour trouver un emploi aligné avec vos valeurs",
-            ownerId: owner.id
+            ownerId: owner.id,
+            categoryId: categories.get("comfort").id
         }
     ];
 
