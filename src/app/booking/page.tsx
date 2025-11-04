@@ -3,13 +3,14 @@
 import { useEffect, useState } from "react";
 import Navbar from "../components/navbars";
 import MiddlewareLogin from "../security/middlewareLogin";
-import { getAllServices, getServicesByCat } from "../actions/services";
+import { getAllServices, getServicesByCatId, getServicesByCatName } from "../actions/services";
 import { getAllCategories } from "../actions/categories";
 
 export default function Booking()
 {
     const [categories, setCategories] = useState([]);
-    const [services, setServices] = useState([]);
+    const [catSelected, setCatSelected] = useState<string>("Photographe professionnel");
+    const [services, setServices] = useState(new Map());
 
     useEffect(() =>
     {
@@ -17,91 +18,64 @@ export default function Booking()
         {
             setCategories(await getAllCategories());
         }
-
         getCategories();
+
+        const getServices = async () =>
+        {
+            setServices(await getAllServices());
+        }
+        getServices();
     }, []);
     
     MiddlewareLogin();
 
-    const handleSetCat = async (catId: number) =>
+    const handleSetCat = async (cat: any) =>
     {
         //console.log(catId);
-
-        setServices(await getServicesByCat(catId));
+        setCatSelected(cat.name);
     }
 
     return (
         <>
             <Navbar />
             
-            <div className="flex flex-wrap justify-around">
-                {
-                    categories.map((cat: any, index: number) =>
+            <div>
+                <h1 className="my-3">BOOKLY PRO</h1>
+                <input type="text" placeholder="Trouver des services" className="mb-3" />
+
+                <div className="flex justify-between items-center bg-gray-100 w-[770px] h-[50px] rounded-lg mb-3">
                     {
-                        const images =
-                        [
-                            {
-                                src: "/img/Studio photographer-cuate.png",
-                                alt: "Photo"
-                            },
-
-                            {
-                                src: "/img/Beauty salon-rafiki.png",
-                                alt: "Beauty"
-                            },
-
-                            {
-                                src: "/img/Pleasant surprise-amico.png",
-                                alt: "Wellness"
-                            }
-                        ];
-                        
-                        return (
-                            <div key={cat.id} className="w-[450px] border-2 rounded-2xl border-solid my-5 mx-5 hover:cursor-pointer hover:scale-105 duration-500 bg-white" onClick={() => handleSetCat(cat.id)}>
-                                <div className="text-center mt-5">{cat.name}</div>
-                                <img src={images[index].src} alt={images[index].alt} />
-                            </div>
-                        )
-                    })
-                }
-            </div>
-
-            {
-                services.length > 0 &&
-
-                <table className="w-full">
-                    <thead>
-                        <tr>
-                            <th className="border">Titre</th>
-                            <th className="border">Durée</th>
-                            <th className="border">Tarif</th>
-                            <th className="border">Description</th>
-                            <th className="border">Proposé par</th>
-                        </tr>
-                    </thead>
-                    
-                    <tbody>
+                        categories.map((cat: any, index: number) =>
                         {
-                            services.map((service: any) =>
+                            return (
+                                <button key={index} className={`rounded-md px-2 h-3/4 ${cat.name === catSelected ? "bg-white text-indigo-700 text-bold border-1 border-gray-200" : ""} hover:cursor-pointer`} onClick={() => handleSetCat(cat)}>{cat.name}</button>
+                            )
+                        })
+                    }
+                </div>
+
+                {
+                    services.get(catSelected) &&
+                    
+                    <div className="rounded-md border-1 border-gray-300 w-[400px]">
+                        {
+                            services.get(catSelected).map((service: any, index: number) =>
                             {
-                                const hours: number = Math.floor(service.duration / 60);
-                                const minutes: number = service.duration % 60;
-                                
                                 return (
-                                    <tr key={service.id}>
-                                        <td className="border">{service.title}</td>
-                                        <td className="border">{hours}h{minutes > 0 ? minutes : ""}</td>
-                                        <td className="border">{service.price} €</td>
-                                        <td className="border">{service.description}</td>
-                                        <td className="border">{service.user.firstname} {service.user.lastname}</td>
-                                        <td className="border"><button>Réserver</button></td>
-                                    </tr>
+                                    <div key={index} className={`${index < services.get(catSelected).length - 1 ? "border-b-1" : ""} border-gray-300 w-9/10 mx-auto my-5`}>
+                                        <h1 className="text-xl">{service.title}</h1>
+                                        <div className="flex justify-between">
+                                            <h1 className="text-lg text-gray-600">{service.duration} min</h1>
+                                            <h1 className="text-lg text-gray-600">{service.price} €</h1>
+                                        </div>
+                                        <p className="text-lg text-gray-600 mb-2">{service.description}</p>
+                                    </div>
                                 )
                             })
                         }
-                    </tbody>
-                </table>
-            }
+                    </div>
+                }
+            </div>
         </>
     )
 }
