@@ -13,10 +13,10 @@ export const getAllServices = async () =>
         {
             const cat = await prisma.category.findUnique({where: {id: service.categoryId}});
 
-            let servicesByCat = servicesMapped.get(cat.name) ?? [];
+            let servicesByCat = servicesMapped.get(cat?.name) ?? [];
             servicesByCat.push(service);
 
-            servicesMapped.set(cat.name, servicesByCat);
+            servicesMapped.set(cat?.name, servicesByCat);
         })
     );
 
@@ -33,7 +33,7 @@ export const getServicesByCatId = async (catId: number) =>
 export const getServicesByCatName = async (name: string) =>
 {
     const cat = await prisma.category.findFirst({where: {name}});
-    let services = await prisma.service.findMany({where: {categoryId: cat.id}, include: { user: true }});
+    let services = await prisma.service.findMany({where: {categoryId: cat?.id}, include: { user: true }});
 
     return services;
 }

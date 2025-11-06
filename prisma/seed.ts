@@ -4,9 +4,64 @@ import { fakerFR as faker } from '@faker-js/faker';
 
 const prisma = new PrismaClient();
 
+const createSession = async (service: any, users: any[]) =>
+{
+    let timestamp = Date.now();
+    timestamp += 24 * 60 * 60 * 1000;
+
+    for(let i = 0 ; i < 60 ; i++)
+    {
+        const date = new Date(timestamp);
+        
+        const day = date.getDate();
+        const dayOfWeek = date.getDay();
+        const month = date.getMonth();
+        const year = date.getFullYear();
+
+        if(dayOfWeek !== 0 && dayOfWeek !== 6)      //Not Saturday not Sunday
+        {
+            let hour = 9;
+            let minute = 0;
+
+            while(1)
+            {
+                const start = new Date(year, month, day, hour, minute);
+                const end = new Date(year, month, day, hour, minute + service.duration);
+                const booked = Math.random() < 0.3;
+                const randomUser = users[Math.floor(Math.random() * users.length)];
+                
+                await prisma.session.create({
+                    data: {
+                        userId : booked ? randomUser.id : null,
+                        serviceId: service.id,
+                        start,
+                        end,
+                        status: booked ? "confirmed" : "free"
+                    }
+                });
+
+                minute += service.duration + 10;
+                if(minute > 59)
+                {
+                    hour++;
+                    minute -= 60;
+                }
+            }
+        }
+    }
+}
+
 export async function main()
 {
+    await prisma.session.deleteMany();
+    await prisma.service.deleteMany();
+    await prisma.category.deleteMany();
+    await prisma.user.deleteMany();
+
+    ////////////////////////////////////////////
+    
     let admins = [];
+    let users = [];
     
     let user = await prisma.user.create({
         data: 
@@ -21,6 +76,7 @@ export async function main()
     });
 
     admins.push(user);
+    users.push(user);
 
     for(let i = 0 ; i < 3 ; i++)
     {
@@ -35,11 +91,12 @@ export async function main()
         });
 
         admins.push(user);
+        users.push(user);
     }
 
     for(let i = 0 ; i < 96 ; i++)
     {
-        await prisma.user.create({
+        const user = await prisma.user.create({
             data: {
                 firstname: faker.person.firstName(),
                 lastname: faker.person.lastName(),
@@ -48,6 +105,8 @@ export async function main()
                 role: "client"
             }
         });
+
+        users.push(user);
     }
 
     ////////////////////
@@ -117,12 +176,16 @@ export async function main()
         }
     ];
 
-    services.map(async (service) =>
-    {
-        await prisma.service.create({
-            data: {...service}
-        });
-    });
+    Promise.all(
+        services.map(async (service) =>
+        {
+            const serviceDB = await prisma.service.create({
+                data: {...service}
+            });
+
+            await createSession(serviceDB, users);
+        })
+    );
 
     /////////////////
 
@@ -175,12 +238,16 @@ export async function main()
         }
     ];
 
-    services.map(async (service) =>
-    {
-        await prisma.service.create({
-            data: {...service}
-        });
-    });
+    Promise.all(
+        services.map(async (service) =>
+        {
+            const serviceDB = await prisma.service.create({
+                data: {...service}
+            });
+
+            await createSession(serviceDB, users);
+        })
+    );
 
     /////////////////
 
@@ -224,13 +291,17 @@ export async function main()
         }
     ];
 
-    services.map(async (service) =>
-    {
-        await prisma.service.create({
-            data: {...service}
-        });
-    });
+    Promise.all(
+        services.map(async (service) =>
+        {
+            const serviceDB = await prisma.service.create({
+                data: {...service}
+            });
 
+            await createSession(serviceDB, users);
+        })
+    );
+    
     console.log("✅ Seed OK");
 }
 

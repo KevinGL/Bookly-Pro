@@ -20,7 +20,7 @@ model User {
   email       String @unique
   password       String
   role        String // "admin" | "client"
-  bookings    Booking[]
+  sessions    Session[]
   services    Service[]
 }
 
@@ -40,17 +40,16 @@ model Service {
   duration    Int // minutes
   price       Float?
   description String?
-  bookings    Booking[]
+  sessions    Session[]
 }
 
-model Booking {
+model Session {
   id          Int @id @default(autoincrement())
-  userId      Int
-  user        User      @relation(fields: [userId], references: [id])
+  userId      Int?
+  user        User?      @relation(fields: [userId], references: [id])
   serviceId   Int
   service     Service   @relation(fields: [serviceId], references: [id])
   start       DateTime
   end         DateTime
   status      String // "confirmed" | "cancelled"
-  notes       String?
 }
